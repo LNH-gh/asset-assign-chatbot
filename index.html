@@ -413,7 +413,7 @@ function askQuestion(q) {
   const input = document.getElementById('msgInput');
   input.value = q;
   autoResize(input);
-  sendMessage();
+  setTimeout(sendMessage, 50);
 }
 
 // ── Parse categories from AI response ──
