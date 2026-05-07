@@ -32,7 +32,6 @@
     overflow: hidden;
   }
 
-  /* ── Header ── */
   .header {
     background: var(--black);
     padding: 13px 18px;
@@ -58,7 +57,6 @@
     margin-right: 5px; vertical-align: middle;
   }
 
-  /* ── Chat Area ── */
   .chat-area {
     flex: 1; overflow-y: auto;
     padding: 18px 14px;
@@ -69,7 +67,6 @@
   .chat-area::-webkit-scrollbar { width: 4px; }
   .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-  /* ── Messages ── */
   .message {
     display: flex; gap: 10px; align-items: flex-end;
     animation: fadeUp 0.2s ease;
@@ -108,7 +105,6 @@
     border-radius: 14px 14px 2px 14px;
   }
 
-  /* ── Typing ── */
   .typing { display: flex; gap: 5px; padding: 12px 14px; align-items: center; }
   .typing span {
     width: 7px; height: 7px; background: var(--black);
@@ -122,7 +118,6 @@
     30% { transform: translateY(-6px); }
   }
 
-  /* ── Suggestion chips ── */
   .suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
 
   button.suggestion-chip {
@@ -138,7 +133,6 @@
   button.suggestion-chip:hover { background: var(--yellow); box-shadow: 1px 1px 0 var(--black); transform: translate(1px,1px); }
   button.suggestion-chip:active { transform: translate(2px,2px); box-shadow: none; }
 
-  /* ── Upload preview ── */
   .upload-preview {
     max-width: 220px; border-radius: 10px;
     border: 2px solid var(--black); margin-bottom: 6px; display: block;
@@ -151,7 +145,6 @@
     font-size: 12px; font-weight: 600; margin-bottom: 6px;
   }
 
-  /* ── CSV download card ── */
   .csv-card {
     background: var(--yellow-light);
     border: 2px solid var(--black);
@@ -162,27 +155,19 @@
   }
 
   .csv-card .csv-categories {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 10px;
-    line-height: 1.7;
+    font-size: 12px; color: var(--text-muted);
+    margin-bottom: 10px; line-height: 1.7;
   }
 
   .csv-card .csv-categories strong {
-    display: block;
-    color: var(--black);
-    margin-bottom: 3px;
-    font-size: 12.5px;
+    display: block; color: var(--black);
+    margin-bottom: 3px; font-size: 12.5px;
   }
 
   .category-tag {
-    display: inline-block;
-    background: var(--white);
-    border: 1.5px solid var(--black);
-    border-radius: 20px;
-    padding: 2px 9px;
-    font-size: 11.5px;
-    font-weight: 600;
+    display: inline-block; background: var(--white);
+    border: 1.5px solid var(--black); border-radius: 20px;
+    padding: 2px 9px; font-size: 11.5px; font-weight: 600;
     margin: 2px 2px 2px 0;
   }
 
@@ -200,7 +185,6 @@
   button.download-btn:hover { background: var(--yellow-dark); box-shadow: 1px 1px 0 var(--black); transform: translate(2px,2px); }
   button.download-btn:active { transform: translate(3px,3px); box-shadow: none; }
 
-  /* ── Input bar ── */
   .input-bar {
     background: var(--white);
     border-top: 2px solid var(--black);
@@ -268,24 +252,20 @@
 </head>
 <body>
 
-<!-- Header -->
 <div class="header">
-  <div class="header-icon">🎈</div>
+  <div class="header-icon">&#x1F388;</div>
   <div class="header-info">
     <h1>Asset Assign Support</h1>
-    <p><span class="status-dot"></span>Ask anything · Upload inventory lists</p>
+    <p><span class="status-dot"></span>Ask anything &middot; Upload inventory lists</p>
   </div>
 </div>
 
-<!-- Chat -->
 <div class="chat-area" id="chatArea"></div>
 
-<!-- Hidden file input -->
 <input type="file" id="fileInput" accept="image/*,.csv,.xlsx,.xls,.txt" />
 
-<!-- Input bar -->
 <div class="input-bar">
-  <button class="upload-btn" type="button" onclick="document.getElementById('fileInput').click()" title="Upload inventory list or image">📎</button>
+  <button class="upload-btn" type="button" onclick="document.getElementById('fileInput').click()" title="Upload inventory list or image">&#x1F4CE;</button>
   <div class="input-wrap">
     <textarea id="msgInput" rows="1" placeholder="Ask a question or describe your inventory..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
   </div>
@@ -293,21 +273,18 @@
     <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
   </button>
 </div>
-<div class="powered">Powered by Claude AI · Asset Assign Help</div>
+<div class="powered">Powered by Claude AI &middot; Asset Assign Help</div>
 
 <script>
-// ✏️  PASTE YOUR CLOUDFLARE WORKER URL HERE
-const WORKER_URL = "https://asset-assign-chatbot.letnicolehelp.workers.dev/";
+var WORKER_URL = "https://asset-assign-chatbot.letnicolehelp.workers.dev/";
 
-// ── State ──
-let messages = [];
-let isLoading = false;
-let pendingAttachment = null;
+var messages = [];
+var isLoading = false;
+var pendingAttachment = null;
 
-// ── Boot ──
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', function() {
   addBotMessage(
-    "Hi there! 👋 Welcome to Asset Assign support. I can answer questions about the app, OR help you convert your existing inventory list into the correct CSV format for uploading.\n\nJust type a question, paste your inventory, or hit 📎 to upload an image or file!",
+    "Hi there! Welcome to Asset Assign support. I can answer questions about the app, OR help you convert your existing inventory list into the correct CSV format for uploading.\n\nJust type a question, paste your inventory, or hit the paperclip to upload an image or file!",
     [
       "How does the phrase checker work?",
       "How do I create a reservation?",
@@ -320,57 +297,68 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fileInput').addEventListener('change', handleFileSelected);
 });
 
-// ── File handling ──
 function handleFileSelected(e) {
-  const file = e.target.files[0];
+  var file = e.target.files[0];
   if (file) processFile(file);
   e.target.value = '';
 }
 
 function processFile(file) {
-  const isImage = file.type.startsWith('image/');
-  const isCSV   = file.name.endsWith('.csv') || file.type === 'text/csv';
-  const isText  = file.name.endsWith('.txt')  || file.type === 'text/plain';
-  const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+  var isImage = file.type.startsWith('image/');
+  var isCSV   = file.name.endsWith('.csv') || file.type === 'text/csv';
+  var isText  = file.name.endsWith('.txt')  || file.type === 'text/plain';
+  var isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
 
   if (isImage) {
-    const reader = new FileReader();
-    reader.onload = evt => {
-      const base64 = evt.target.result.split(',')[1];
+    var reader = new FileReader();
+    reader.onload = function(evt) {
+      var base64 = evt.target.result.split(',')[1];
       pendingAttachment = { type: 'image', data: base64, mediaType: file.type, label: file.name, src: evt.target.result };
       showAttachmentPreview(file.name, 'image');
     };
     reader.readAsDataURL(file);
   } else if (isCSV || isText) {
-    const reader = new FileReader();
-    reader.onload = evt => {
+    var reader2 = new FileReader();
+    reader2.onload = function(evt) {
       pendingAttachment = { type: 'text', data: evt.target.result, label: file.name };
       showAttachmentPreview(file.name, 'file');
     };
-    reader.readAsText(file);
+    reader2.readAsText(file);
   } else if (isExcel) {
-    addBotMessage("I can read images, CSV files, and plain text files! For Excel files (.xlsx), please save as CSV first (File → Save As → CSV in Excel, or File → Download → CSV in Google Sheets) and then upload that. Need help with that step?");
+    addBotMessage("I can read images, CSV files, and plain text files! For Excel files (.xlsx), please save as CSV first (File > Save As > CSV in Excel, or File > Download > CSV in Google Sheets) and then upload that. Need help with that step?");
   } else {
     addBotMessage("I can work with images (photos of your inventory list), CSV files, and plain text files. Give one of those a try!");
   }
 }
 
 function showAttachmentPreview(label, type) {
-  const existing = document.getElementById('attachPreviewBar');
+  var existing = document.getElementById('attachPreviewBar');
   if (existing) existing.remove();
 
-  const div = document.createElement('div');
+  var div = document.createElement('div');
   div.id = 'attachPreviewBar';
-  div.style.cssText = 'display:flex; align-items:center; gap:8px; background:var(--yellow-light); border-top:1.5px solid var(--black); padding:7px 13px; font-size:12px; font-weight:600; flex-shrink:0;';
-  div.innerHTML = `
-    <span>${type === 'image' ? '🖼️' : '📄'}</span>
-    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(label)}</span>
-    <button type="button" onclick="clearAttachment()" style="background:none;border:none;cursor:pointer;font-size:15px;padding:0;line-height:1;">✕</button>
-  `;
+  div.style.cssText = 'display:flex;align-items:center;gap:8px;background:var(--yellow-light);border-top:1.5px solid var(--black);padding:7px 13px;font-size:12px;font-weight:600;flex-shrink:0;';
+
+  var icon = document.createElement('span');
+  icon.textContent = type === 'image' ? 'Image:' : 'File:';
+
+  var nameSpan = document.createElement('span');
+  nameSpan.textContent = label;
+  nameSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+
+  var closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = 'x';
+  closeBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:15px;padding:0;line-height:1;';
+  closeBtn.onclick = clearAttachment;
+
+  div.appendChild(icon);
+  div.appendChild(nameSpan);
+  div.appendChild(closeBtn);
 
   document.getElementById('fileInput').after(div);
 
-  const ta = document.getElementById('msgInput');
+  var ta = document.getElementById('msgInput');
   if (!ta.value.trim()) {
     ta.value = "Please convert this inventory list to the Asset Assign CSV format.";
     autoResize(ta);
@@ -379,13 +367,12 @@ function showAttachmentPreview(label, type) {
 
 function clearAttachment() {
   pendingAttachment = null;
-  const bar = document.getElementById('attachPreviewBar');
+  var bar = document.getElementById('attachPreviewBar');
   if (bar) bar.remove();
 }
 
-// ── Helpers ──
 function escapeHtml(t) {
-  const d = document.createElement('div');
+  var d = document.createElement('div');
   d.appendChild(document.createTextNode(t));
   return d.innerHTML;
 }
@@ -393,7 +380,7 @@ function escapeHtml(t) {
 function formatText(text) {
   return escapeHtml(text)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br/>');
+    .replace(/\n/g, '<br>');
 }
 
 function autoResize(el) {
@@ -406,136 +393,178 @@ function handleKey(e) {
 }
 
 function askQuestion(q) {
-  const input = document.getElementById('msgInput');
+  var input = document.getElementById('msgInput');
   input.value = q;
   autoResize(input);
   setTimeout(sendMessage, 50);
 }
 
-// ── Parse categories from AI response ──
 function extractCategories(text) {
-  const match = text.match(/\[CATEGORIES:\s*([^\]]+)\]/);
+  var match = text.match(/\[CATEGORIES:\s*([^\]]+)\]/);
   if (!match) return [];
-  return match[1].split(',').map(c => c.trim()).filter(Boolean);
+  return match[1].split(',').map(function(c) { return c.trim(); }).filter(Boolean);
 }
 
-// ── Render messages ──
-function addBotMessage(text, chips = []) {
-  const chatArea = document.getElementById('chatArea');
-  const div = document.createElement('div');
-  div.className = 'message bot';
+function addBotMessage(text, chips) {
+  chips = chips || [];
+  var chatArea = document.getElementById('chatArea');
+  var outer = document.createElement('div');
+  outer.className = 'message bot';
 
-  // Detect CSV block
-  const csvMatch = text.match(/```csv\n([\s\S]*?)```/);
-  const categories = extractCategories(text);
+  var avatar = document.createElement('div');
+  avatar.className = 'msg-avatar bot';
+  avatar.textContent = String.fromCodePoint(0x1F388);
 
-  // Clean display text: remove csv block and category tag
-  let displayText = text
+  var inner = document.createElement('div');
+
+  var csvMatch = text.match(/```csv\n([\s\S]*?)```/);
+  var categories = extractCategories(text);
+
+  var displayText = text
     .replace(/```csv\n[\s\S]*?```/, '')
     .replace(/\[CATEGORIES:[^\]]*\]/, '')
     .trim();
 
-  let csvCard = '';
-  if (csvMatch) {
-    const csvContent = csvMatch[1].trim();
-    const encoded = encodeURIComponent(csvContent);
-
-    const categoryTagsHtml = categories.length
-      ? categories.map(c => `<span class="category-tag">${escapeHtml(c)}</span>`).join(' ')
-      : '';
-
-    const categorySummaryHtml = categories.length
-      ? `<div class="csv-categories">
-           <strong>Categories used in your CSV:</strong>
-           ${categoryTagsHtml}
-         </div>`
-      : '';
-
-    csvCard = `
-      <div class="csv-card">
-        ${categorySummaryHtml}
-        <button class="download-btn" type="button" onclick="downloadCSV(decodeURIComponent('${encoded}'))">
-          ⬇️ Download CSV
-        </button>
-      </div>`;
+  if (displayText) {
+    var bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = formatText(displayText);
+    inner.appendChild(bubble);
   }
 
-  const chipsHtml = chips.length
-    ? `<div class="suggestions">${chips.map(c => {
-        const safe = escapeHtml(c);
-        const json = JSON.stringify(c);
-        return `<button class="suggestion-chip" type="button" onclick="askQuestion(${json})">${safe}</button>`;
-      }).join('')}</div>`
-    : '';
+  if (csvMatch) {
+    var csvContent = csvMatch[1].trim();
+    var encoded = encodeURIComponent(csvContent);
 
-  div.innerHTML = `
-    <div class="msg-avatar bot">🎈</div>
-    <div>
-      ${displayText ? `<div class="bubble">${formatText(displayText)}</div>` : ''}
-      ${csvCard}
-      ${chipsHtml}
-    </div>`;
-  chatArea.appendChild(div);
+    var card = document.createElement('div');
+    card.className = 'csv-card';
+
+    if (categories.length) {
+      var catDiv = document.createElement('div');
+      catDiv.className = 'csv-categories';
+      var catLabel = document.createElement('strong');
+      catLabel.textContent = 'Categories used in your CSV:';
+      catDiv.appendChild(catLabel);
+      categories.forEach(function(c) {
+        var tag = document.createElement('span');
+        tag.className = 'category-tag';
+        tag.textContent = c;
+        catDiv.appendChild(tag);
+      });
+      card.appendChild(catDiv);
+    }
+
+    var dlBtn = document.createElement('button');
+    dlBtn.className = 'download-btn';
+    dlBtn.type = 'button';
+    dlBtn.textContent = 'Download CSV';
+    dlBtn.onclick = function() { downloadCSV(decodeURIComponent(encoded)); };
+    card.appendChild(dlBtn);
+    inner.appendChild(card);
+  }
+
+  if (chips.length) {
+    var sugDiv = document.createElement('div');
+    sugDiv.className = 'suggestions';
+    chips.forEach(function(c) {
+      var btn = document.createElement('button');
+      btn.className = 'suggestion-chip';
+      btn.type = 'button';
+      btn.textContent = c;
+      btn.onclick = function() { askQuestion(c); };
+      sugDiv.appendChild(btn);
+    });
+    inner.appendChild(sugDiv);
+  }
+
+  outer.appendChild(avatar);
+  outer.appendChild(inner);
+  chatArea.appendChild(outer);
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
 function addUserMessage(text, attach) {
-  const chatArea = document.getElementById('chatArea');
-  const div = document.createElement('div');
-  div.className = 'message user';
+  var chatArea = document.getElementById('chatArea');
+  var outer = document.createElement('div');
+  outer.className = 'message user';
 
-  let attachHtml = '';
+  var avatar = document.createElement('div');
+  avatar.className = 'msg-avatar user';
+  avatar.textContent = 'YOU';
+
+  var inner = document.createElement('div');
+
   if (attach) {
     if (attach.type === 'image') {
-      attachHtml = `<img src="${attach.src}" class="upload-preview" alt="Uploaded inventory" />`;
+      var img = document.createElement('img');
+      img.src = attach.src;
+      img.className = 'upload-preview';
+      img.alt = 'Uploaded inventory';
+      inner.appendChild(img);
     } else {
-      attachHtml = `<div class="file-badge">📄 ${escapeHtml(attach.label)}</div>`;
+      var badge = document.createElement('div');
+      badge.className = 'file-badge';
+      badge.textContent = 'File: ' + attach.label;
+      inner.appendChild(badge);
     }
   }
 
-  div.innerHTML = `
-    <div class="msg-avatar user">YOU</div>
-    <div>
-      ${attachHtml}
-      ${text ? `<div class="bubble">${escapeHtml(text)}</div>` : ''}
-    </div>`;
-  chatArea.appendChild(div);
+  if (text) {
+    var bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    inner.appendChild(bubble);
+  }
+
+  outer.appendChild(avatar);
+  outer.appendChild(inner);
+  chatArea.appendChild(outer);
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
 function showTyping() {
-  const chatArea = document.getElementById('chatArea');
-  const div = document.createElement('div');
-  div.className = 'message bot';
-  div.id = 'typingIndicator';
-  div.innerHTML = `
-    <div class="msg-avatar bot">🎈</div>
-    <div class="bubble typing"><span></span><span></span><span></span></div>`;
-  chatArea.appendChild(div);
+  var chatArea = document.getElementById('chatArea');
+  var outer = document.createElement('div');
+  outer.className = 'message bot';
+  outer.id = 'typingIndicator';
+
+  var avatar = document.createElement('div');
+  avatar.className = 'msg-avatar bot';
+  avatar.textContent = String.fromCodePoint(0x1F388);
+
+  var bubble = document.createElement('div');
+  bubble.className = 'bubble typing';
+  for (var i = 0; i < 3; i++) {
+    var span = document.createElement('span');
+    bubble.appendChild(span);
+  }
+
+  outer.appendChild(avatar);
+  outer.appendChild(bubble);
+  chatArea.appendChild(outer);
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
 function removeTyping() {
-  const el = document.getElementById('typingIndicator');
+  var el = document.getElementById('typingIndicator');
   if (el) el.remove();
 }
 
-// ── CSV download ──
 function downloadCSV(csvContent) {
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = 'asset-assign-inventory.csv';
+  var blob = new Blob([csvContent], { type: 'text/csv' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url;
+  a.download = 'asset-assign-inventory.csv';
   a.click();
   URL.revokeObjectURL(url);
 }
 
-// ── Send ──
 async function sendMessage() {
   if (isLoading) return;
-  const input  = document.getElementById('msgInput');
-  const text   = input.value.trim();
-  const attach = pendingAttachment;
+  var input  = document.getElementById('msgInput');
+  var text   = input.value.trim();
+  var attach = pendingAttachment;
 
   if (!text && !attach) return;
 
@@ -547,8 +576,7 @@ async function sendMessage() {
   addUserMessage(text, attach);
   clearAttachment();
 
-  // Build API message content
-  let userContent;
+  var userContent;
   if (attach && attach.type === 'image') {
     userContent = [
       { type: 'image', source: { type: 'base64', media_type: attach.mediaType, data: attach.data } },
@@ -563,23 +591,18 @@ async function sendMessage() {
   messages.push({ role: 'user', content: userContent });
   showTyping();
 
-  // Use Sonnet for image uploads (vision), Haiku for text-only
-  const model = (attach && attach.type === 'image')
+  var model = (attach && attach.type === 'image')
     ? 'claude-sonnet-4-20250514'
     : 'claude-haiku-4-5-20251001';
 
   try {
-    const res = await fetch(WORKER_URL, {
+    var res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        max_tokens: 1500,
-        messages
-      })
+      body: JSON.stringify({ model: model, max_tokens: 1500, messages: messages })
     });
 
-    const data = await res.json();
+    var data = await res.json();
     removeTyping();
 
     if (data.error) {
@@ -587,13 +610,13 @@ async function sendMessage() {
       console.error(data.error);
       messages.pop();
     } else {
-      const reply = data.content[0].text;
+      var reply = data.content[0].text;
       messages.push({ role: 'assistant', content: reply });
       addBotMessage(reply);
     }
   } catch (err) {
     removeTyping();
-    addBotMessage("Sorry, I couldn't connect right now. Please try again in a moment.");
+    addBotMessage("Sorry, I could not connect right now. Please try again in a moment.");
     console.error(err);
     messages.pop();
   }
