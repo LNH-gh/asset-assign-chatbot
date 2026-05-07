@@ -361,11 +361,7 @@ function showAttachmentPreview(label, type) {
 
   const div = document.createElement('div');
   div.id = 'attachPreviewBar';
-  div.style.cssText = `
-    display:flex; align-items:center; gap:8px;
-    background:var(--yellow-light); border-top:1.5px solid var(--black);
-    padding:7px 13px; font-size:12px; font-weight:600; flex-shrink:0;
-  `;
+  div.style.cssText = 'display:flex; align-items:center; gap:8px; background:var(--yellow-light); border-top:1.5px solid var(--black); padding:7px 13px; font-size:12px; font-weight:600; flex-shrink:0;';
   div.innerHTML = `
     <span>${type === 'image' ? '🖼️' : '📄'}</span>
     <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(label)}</span>
@@ -559,7 +555,7 @@ async function sendMessage() {
       { type: 'text', text: text || "Please convert this inventory list to the Asset Assign CSV format." }
     ];
   } else if (attach && attach.type === 'text') {
-    userContent = `${text ? text + '\n\n' : ''}Here is my inventory file (${attach.label}):\n\n${attach.data}`;
+    userContent = (text ? text + '\n\n' : '') + 'Here is my inventory file (' + attach.label + '):\n\n' + attach.data;
   } else {
     userContent = text;
   }
