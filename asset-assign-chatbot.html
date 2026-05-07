@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Asset Assign Support</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --yellow: #F5D547;
+    --yellow-dark: #d4b730;
+    --yellow-light: #fdf6c3;
+    --black: #111111;
+    --white: #ffffff;
+    --bg: #f9f8f5;
+    --text: #111111;
+    --text-muted: #6b6b6b;
+    --border: #e8e4d8;
+    --radius: 14px;
+  }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--black);
+    padding: 13px 18px;
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+    border-bottom: 3px solid var(--yellow);
+  }
+
+  .header-icon {
+    width: 36px; height: 36px;
+    background: var(--yellow); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+    border: 2px solid var(--yellow-dark);
+  }
+
+  .header-info h1 { font-size: 14px; font-weight: 700; color: var(--white); line-height: 1.2; }
+  .header-info p  { font-size: 11.5px; color: #999; margin-top: 2px; }
+
+  .status-dot {
+    display: inline-block; width: 6px; height: 6px;
+    background: #4ade80; border-radius: 50%;
+    margin-right: 5px; vertical-align: middle;
+  }
+
+  /* ── Chat Area ── */
+  .chat-area {
+    flex: 1; overflow-y: auto;
+    padding: 18px 14px;
+    display: flex; flex-direction: column; gap: 14px;
+    scroll-behavior: smooth;
+  }
+
+  .chat-area::-webkit-scrollbar { width: 4px; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ── Messages ── */
+  .message {
+    display: flex; gap: 10px; align-items: flex-end;
+    animation: fadeUp 0.2s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--black);
+  }
+
+  .msg-avatar.bot  { background: var(--yellow); font-size: 15px; }
+  .msg-avatar.user { background: var(--black); color: var(--yellow); font-size: 10px; font-weight: 700; font-family: 'Space Mono', monospace; }
+
+  .bubble {
+    max-width: 78%; padding: 11px 14px;
+    font-size: 13.5px; line-height: 1.6;
+    border: 2px solid var(--black);
+  }
+
+  .message.bot .bubble {
+    background: var(--white);
+    border-radius: 14px 14px 14px 2px;
+    box-shadow: 3px 3px 0px var(--yellow);
+  }
+
+  .message.user .bubble {
+    background: var(--black); color: var(--white);
+    border-radius: 14px 14px 2px 14px;
+  }
+
+  /* ── Typing ── */
+  .typing { display: flex; gap: 5px; padding: 12px 14px; align-items: center; }
+  .typing span {
+    width: 7px; height: 7px; background: var(--black);
+    border-radius: 50%; animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* ── Suggestion chips ── */
+  .suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+
+  button.suggestion-chip {
+    padding: 6px 12px;
+    background: var(--yellow-light); color: var(--black);
+    border: 1.5px solid var(--black); border-radius: 20px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+    box-shadow: 2px 2px 0 var(--black);
+    appearance: none; -webkit-appearance: none; line-height: 1.4;
+  }
+
+  button.suggestion-chip:hover { background: var(--yellow); box-shadow: 1px 1px 0 var(--black); transform: translate(1px,1px); }
+  button.suggestion-chip:active { transform: translate(2px,2px); box-shadow: none; }
+
+  /* ── Upload preview ── */
+  .upload-preview {
+    max-width: 220px; border-radius: 10px;
+    border: 2px solid var(--black); margin-bottom: 6px; display: block;
+  }
+
+  .file-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--yellow-light); border: 1.5px solid var(--black);
+    border-radius: 8px; padding: 6px 10px;
+    font-size: 12px; font-weight: 600; margin-bottom: 6px;
+  }
+
+  /* ── CSV download card ── */
+  .csv-card {
+    background: var(--yellow-light);
+    border: 2px solid var(--black);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 10px;
+    box-shadow: 3px 3px 0 var(--black);
+  }
+
+  .csv-card .csv-categories {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+
+  .csv-card .csv-categories strong {
+    display: block;
+    color: var(--black);
+    margin-bottom: 3px;
+    font-size: 12.5px;
+  }
+
+  .category-tag {
+    display: inline-block;
+    background: var(--white);
+    border: 1.5px solid var(--black);
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin: 2px 2px 2px 0;
+  }
+
+  button.download-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px;
+    background: var(--yellow); color: var(--black);
+    border: 2px solid var(--black); border-radius: 9px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+    box-shadow: 3px 3px 0 var(--black);
+    appearance: none; -webkit-appearance: none;
+  }
+
+  button.download-btn:hover { background: var(--yellow-dark); box-shadow: 1px 1px 0 var(--black); transform: translate(2px,2px); }
+  button.download-btn:active { transform: translate(3px,3px); box-shadow: none; }
+
+  /* ── Input bar ── */
+  .input-bar {
+    background: var(--white);
+    border-top: 2px solid var(--black);
+    padding: 11px 13px;
+    display: flex; gap: 9px; align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  button.upload-btn {
+    width: 38px; height: 38px;
+    background: var(--white); color: var(--black);
+    border: 2px solid var(--black); border-radius: 10px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+    box-shadow: 2px 2px 0 var(--black);
+    appearance: none; -webkit-appearance: none;
+    font-size: 17px; line-height: 1;
+  }
+
+  button.upload-btn:hover { background: var(--yellow-light); box-shadow: 1px 1px 0 var(--black); transform: translate(1px,1px); }
+
+  .input-wrap {
+    flex: 1; background: var(--bg);
+    border: 2px solid var(--black); border-radius: 11px;
+    display: flex; align-items: center;
+    padding: 4px 6px 4px 12px; transition: all 0.2s;
+  }
+
+  .input-wrap:focus-within {
+    border-color: var(--yellow-dark);
+    box-shadow: 0 0 0 3px rgba(245,213,71,0.25);
+  }
+
+  textarea {
+    flex: 1; border: none; background: transparent;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13.5px; color: var(--text);
+    resize: none; outline: none; line-height: 1.5;
+    max-height: 110px; padding: 7px 0;
+  }
+
+  textarea::placeholder { color: #bbb; }
+
+  button.send-btn {
+    width: 38px; height: 38px;
+    background: var(--yellow); border: 2px solid var(--black); border-radius: 10px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+    box-shadow: 2px 2px 0 var(--black);
+    appearance: none; -webkit-appearance: none;
+  }
+
+  button.send-btn:hover { background: var(--yellow-dark); box-shadow: 1px 1px 0 var(--black); transform: translate(1px,1px); }
+  button.send-btn:active { transform: translate(2px,2px); box-shadow: none; }
+  button.send-btn:disabled { background: #eee; border-color: #ccc; box-shadow: none; cursor: not-allowed; }
+  button.send-btn svg { width: 16px; height: 16px; fill: var(--black); }
+
+  .powered {
+    text-align: center; font-size: 10px; color: #ccc;
+    padding: 3px 0 2px; font-family: 'Space Mono', monospace;
+  }
+
+  #fileInput { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-icon">🎈</div>
+  <div class="header-info">
+    <h1>Asset Assign Support</h1>
+    <p><span class="status-dot"></span>Ask anything · Upload inventory lists</p>
+  </div>
+</div>
+
+<!-- Chat -->
+<div class="chat-area" id="chatArea"></div>
+
+<!-- Hidden file input -->
+<input type="file" id="fileInput" accept="image/*,.csv,.xlsx,.xls,.txt" />
+
+<!-- Input bar -->
+<div class="input-bar">
+  <button class="upload-btn" type="button" onclick="document.getElementById('fileInput').click()" title="Upload inventory list or image">📎</button>
+  <div class="input-wrap">
+    <textarea id="msgInput" rows="1" placeholder="Ask a question or describe your inventory..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+  </div>
+  <button class="send-btn" id="sendBtn" type="button" onclick="sendMessage()">
+    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+  </button>
+</div>
+<div class="powered">Powered by Claude AI · Asset Assign Help</div>
+
+<script>
+// ✏️  PASTE YOUR CLOUDFLARE WORKER URL HERE
+const WORKER_URL = "https://asset-assign.letnicolehelp.workers.dev/";
+
+// ── State ──
+let messages = [];
+let isLoading = false;
+let pendingAttachment = null;
+
+// ── Boot ──
+window.addEventListener('DOMContentLoaded', () => {
+  addBotMessage(
+    "Hi there! 👋 Welcome to Asset Assign support. I can answer questions about the app, OR help you convert your existing inventory list into the correct CSV format for uploading.\n\nJust type a question, paste your inventory, or hit 📎 to upload an image or file!",
+    [
+      "How does the phrase checker work?",
+      "How do I create a reservation?",
+      "Convert my inventory list to CSV",
+      "What does it cost?",
+      "How long is the free trial?",
+      "Can I cancel anytime?"
+    ]
+  );
+  document.getElementById('fileInput').addEventListener('change', handleFileSelected);
+});
+
+// ── File handling ──
+function handleFileSelected(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+  e.target.value = '';
+}
+
+function processFile(file) {
+  const isImage = file.type.startsWith('image/');
+  const isCSV   = file.name.endsWith('.csv') || file.type === 'text/csv';
+  const isText  = file.name.endsWith('.txt')  || file.type === 'text/plain';
+  const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+
+  if (isImage) {
+    const reader = new FileReader();
+    reader.onload = evt => {
+      const base64 = evt.target.result.split(',')[1];
+      pendingAttachment = { type: 'image', data: base64, mediaType: file.type, label: file.name, src: evt.target.result };
+      showAttachmentPreview(file.name, 'image');
+    };
+    reader.readAsDataURL(file);
+  } else if (isCSV || isText) {
+    const reader = new FileReader();
+    reader.onload = evt => {
+      pendingAttachment = { type: 'text', data: evt.target.result, label: file.name };
+      showAttachmentPreview(file.name, 'file');
+    };
+    reader.readAsText(file);
+  } else if (isExcel) {
+    addBotMessage("I can read images, CSV files, and plain text files! For Excel files (.xlsx), please save as CSV first (File → Save As → CSV in Excel, or File → Download → CSV in Google Sheets) and then upload that. Need help with that step?");
+  } else {
+    addBotMessage("I can work with images (photos of your inventory list), CSV files, and plain text files. Give one of those a try!");
+  }
+}
+
+function showAttachmentPreview(label, type) {
+  const existing = document.getElementById('attachPreviewBar');
+  if (existing) existing.remove();
+
+  const div = document.createElement('div');
+  div.id = 'attachPreviewBar';
+  div.style.cssText = `
+    display:flex; align-items:center; gap:8px;
+    background:var(--yellow-light); border-top:1.5px solid var(--black);
+    padding:7px 13px; font-size:12px; font-weight:600; flex-shrink:0;
+  `;
+  div.innerHTML = `
+    <span>${type === 'image' ? '🖼️' : '📄'}</span>
+    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(label)}</span>
+    <button type="button" onclick="clearAttachment()" style="background:none;border:none;cursor:pointer;font-size:15px;padding:0;line-height:1;">✕</button>
+  `;
+
+  document.getElementById('fileInput').after(div);
+
+  const ta = document.getElementById('msgInput');
+  if (!ta.value.trim()) {
+    ta.value = "Please convert this inventory list to the Asset Assign CSV format.";
+    autoResize(ta);
+  }
+}
+
+function clearAttachment() {
+  pendingAttachment = null;
+  const bar = document.getElementById('attachPreviewBar');
+  if (bar) bar.remove();
+}
+
+// ── Helpers ──
+function escapeHtml(t) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(t));
+  return d.innerHTML;
+}
+
+function formatText(text) {
+  return escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br/>');
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function askQuestion(q) {
+  const input = document.getElementById('msgInput');
+  input.value = q;
+  autoResize(input);
+  sendMessage();
+}
+
+// ── Parse categories from AI response ──
+function extractCategories(text) {
+  const match = text.match(/\[CATEGORIES:\s*([^\]]+)\]/);
+  if (!match) return [];
+  return match[1].split(',').map(c => c.trim()).filter(Boolean);
+}
+
+// ── Render messages ──
+function addBotMessage(text, chips = []) {
+  const chatArea = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'message bot';
+
+  // Detect CSV block
+  const csvMatch = text.match(/```csv\n([\s\S]*?)```/);
+  const categories = extractCategories(text);
+
+  // Clean display text: remove csv block and category tag
+  let displayText = text
+    .replace(/```csv\n[\s\S]*?```/, '')
+    .replace(/\[CATEGORIES:[^\]]*\]/, '')
+    .trim();
+
+  let csvCard = '';
+  if (csvMatch) {
+    const csvContent = csvMatch[1].trim();
+    const encoded = encodeURIComponent(csvContent);
+
+    const categoryTagsHtml = categories.length
+      ? categories.map(c => `<span class="category-tag">${escapeHtml(c)}</span>`).join(' ')
+      : '';
+
+    const categorySummaryHtml = categories.length
+      ? `<div class="csv-categories">
+           <strong>Categories used in your CSV:</strong>
+           ${categoryTagsHtml}
+         </div>`
+      : '';
+
+    csvCard = `
+      <div class="csv-card">
+        ${categorySummaryHtml}
+        <button class="download-btn" type="button" onclick="downloadCSV(decodeURIComponent('${encoded}'))">
+          ⬇️ Download CSV
+        </button>
+      </div>`;
+  }
+
+  const chipsHtml = chips.length
+    ? `<div class="suggestions">${chips.map(c => {
+        const safe = escapeHtml(c);
+        const json = JSON.stringify(c);
+        return `<button class="suggestion-chip" type="button" onclick="askQuestion(${json})">${safe}</button>`;
+      }).join('')}</div>`
+    : '';
+
+  div.innerHTML = `
+    <div class="msg-avatar bot">🎈</div>
+    <div>
+      ${displayText ? `<div class="bubble">${formatText(displayText)}</div>` : ''}
+      ${csvCard}
+      ${chipsHtml}
+    </div>`;
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function addUserMessage(text, attach) {
+  const chatArea = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'message user';
+
+  let attachHtml = '';
+  if (attach) {
+    if (attach.type === 'image') {
+      attachHtml = `<img src="${attach.src}" class="upload-preview" alt="Uploaded inventory" />`;
+    } else {
+      attachHtml = `<div class="file-badge">📄 ${escapeHtml(attach.label)}</div>`;
+    }
+  }
+
+  div.innerHTML = `
+    <div class="msg-avatar user">YOU</div>
+    <div>
+      ${attachHtml}
+      ${text ? `<div class="bubble">${escapeHtml(text)}</div>` : ''}
+    </div>`;
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function showTyping() {
+  const chatArea = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'message bot';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <div class="msg-avatar bot">🎈</div>
+    <div class="bubble typing"><span></span><span></span><span></span></div>`;
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+// ── CSV download ──
+function downloadCSV(csvContent) {
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'asset-assign-inventory.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Send ──
+async function sendMessage() {
+  if (isLoading) return;
+  const input  = document.getElementById('msgInput');
+  const text   = input.value.trim();
+  const attach = pendingAttachment;
+
+  if (!text && !attach) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  addUserMessage(text, attach);
+  clearAttachment();
+
+  // Build API message content
+  let userContent;
+  if (attach && attach.type === 'image') {
+    userContent = [
+      { type: 'image', source: { type: 'base64', media_type: attach.mediaType, data: attach.data } },
+      { type: 'text', text: text || "Please convert this inventory list to the Asset Assign CSV format." }
+    ];
+  } else if (attach && attach.type === 'text') {
+    userContent = `${text ? text + '\n\n' : ''}Here is my inventory file (${attach.label}):\n\n${attach.data}`;
+  } else {
+    userContent = text;
+  }
+
+  messages.push({ role: 'user', content: userContent });
+  showTyping();
+
+  // Use Sonnet for image uploads (vision), Haiku for text-only
+  const model = (attach && attach.type === 'image')
+    ? 'claude-sonnet-4-20250514'
+    : 'claude-haiku-4-5-20251001';
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1500,
+        messages
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.error) {
+      addBotMessage("Hmm, something went wrong. Please try again in a moment.");
+      console.error(data.error);
+      messages.pop();
+    } else {
+      const reply = data.content[0].text;
+      messages.push({ role: 'assistant', content: reply });
+      addBotMessage(reply);
+    }
+  } catch (err) {
+    removeTyping();
+    addBotMessage("Sorry, I couldn't connect right now. Please try again in a moment.");
+    console.error(err);
+    messages.pop();
+  }
+
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('msgInput').focus();
+}
+</script>
+</body>
+</html>
