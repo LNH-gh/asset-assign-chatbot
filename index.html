@@ -253,9 +253,9 @@
 <body>
 
 <div class="header">
-  <div class="header-icon">&#x1F388;</div>
+  <img src="./assetassign.app.png" alt="Asset Assign" style="width:36px;height:36px;border-radius:8px;border:2px solid var(--yellow-dark);object-fit:contain;background:var(--yellow);" />
   <div class="header-info">
-    <h1>Asset Assign Support</h1>
+    <h1>Amy · Asset Assign Support</h1>
     <p><span class="status-dot"></span>Ask anything &middot; Upload inventory lists</p>
   </div>
 </div>
@@ -284,7 +284,7 @@ var pendingAttachment = null;
 
 window.addEventListener('DOMContentLoaded', function() {
   addBotMessage(
-    "Hi there! Welcome to Asset Assign support. I can answer questions about the app, OR help you convert your existing inventory list into the correct CSV format for uploading.\n\nJust type a question, paste your inventory, or hit the paperclip to upload an image or file!",
+    "Hi there! I'm Amy, your Asset Assign support assistant. I can answer questions about the app, OR help you convert your existing inventory list into the correct CSV format for uploading.\n\nJust type a question, paste your inventory, or hit the paperclip to upload an image or file!",
     [
       "How does the phrase checker work?",
       "How do I create a reservation?",
@@ -413,7 +413,7 @@ function addBotMessage(text, chips) {
 
   var avatar = document.createElement('div');
   avatar.className = 'msg-avatar bot';
-  avatar.textContent = String.fromCodePoint(0x1F388);
+  avatar.textContent = 'A';
 
   var inner = document.createElement('div');
 
@@ -530,7 +530,7 @@ function showTyping() {
 
   var avatar = document.createElement('div');
   avatar.className = 'msg-avatar bot';
-  avatar.textContent = String.fromCodePoint(0x1F388);
+  avatar.textContent = 'A';
 
   var bubble = document.createElement('div');
   bubble.className = 'bubble typing';
