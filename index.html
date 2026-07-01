@@ -592,14 +592,18 @@ async function sendMessage() {
   showTyping();
 
   var model = (attach && attach.type === 'image')
-    ? 'claude-sonnet-4-20250514'
+    ? 'claude-sonnet-4-6'
     : 'claude-haiku-4-5-20251001';
+
+  var urlParams = new URLSearchParams(window.location.search);
+  var userName = urlParams.get('userName') || '';
+  var userEmail = urlParams.get('userEmail') || '';
 
   try {
     var res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: model, max_tokens: 1500, messages: messages })
+      body: JSON.stringify({ model: model, max_tokens: 1500, messages: messages, userName: userName, userEmail: userEmail })
     });
 
     var data = await res.json();
