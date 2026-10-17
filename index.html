@@ -278,6 +278,21 @@
 <script>
 var WORKER_URL = "https://asset-assign-chatbot.letnicolehelp.workers.dev/";
 
+// Tell the page embedding this one (the Asset Assign app) that a conversation
+// started. Sent once per conversation, only to the app's own origin (the live
+// app, a Vercel preview, or a local dev server), and never when this page is
+// open on its own. Nothing about the conversation travels with it.
+function notifyParentChatStarted() {
+  try {
+    if (window.parent === window || !document.referrer) return;
+    var parentOrigin = new URL(document.referrer).origin;
+    var host = new URL(document.referrer).hostname;
+    var trusted = host === 'app.assetassign.app' || host === 'localhost' || /\.vercel\.app$/.test(host);
+    if (!trusted) return;
+    window.parent.postMessage({ type: 'amy-chat-started' }, parentOrigin);
+  } catch (e) {}
+}
+
 var messages = [];
 var isLoading = false;
 var pendingAttachment = null;
@@ -617,6 +632,11 @@ async function sendMessage() {
       var reply = data.content[0].text;
       messages.push({ role: 'assistant', content: reply });
       addBotMessage(reply);
+      // First reply of this conversation: tell the app, which shows this page
+      // in a frame, so it can award Amy's chat badges.
+      if (messages.filter(function (m) { return m.role === 'user'; }).length === 1) {
+        notifyParentChatStarted();
+      }
     }
   } catch (err) {
     removeTyping();
